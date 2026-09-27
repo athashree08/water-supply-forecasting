@@ -1,28 +1,32 @@
 import pdfplumber
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
 PDF_DIR = PROJECT_ROOT / "data" / "raw" / "pdfs"
 
 
-def inspect_pdf(pdf_path):
-
+def inspect_tables(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
 
-        print("Number of pages:", len(pdf.pages))
+        for page_number in [22, 23, 24]:
 
-        for page_number, page in enumerate(pdf.pages, start=1):
+            page = pdf.pages[page_number - 1]
 
-            text = page.extract_text()
-
-            print("\n" + "=" * 60)
+            print("\n" + "=" * 80)
             print(f"PAGE {page_number}")
-            print("=" * 60)
+            print("=" * 80)
 
-            if text:
-                print(text[:2000])
+            tables = page.extract_tables()
+
+            print(f"Number of tables found: {len(tables)}")
+
+            for table_number, table in enumerate(tables, start=1):
+
+                print(f"\n--- TABLE {table_number} ---")
+                print(f"Rows: {len(table)}")
+
+                for row in table[:8]:
+                    print(row)
 
 
 if __name__ == "__main__":
@@ -40,4 +44,4 @@ if __name__ == "__main__":
     print("Inspecting:")
     print(latest_pdf)
 
-    inspect_pdf(latest_pdf)
+    inspect_tables(latest_pdf)
